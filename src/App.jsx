@@ -17,75 +17,6 @@ function App() {
             }
   }
 
-  function readPrototype(){
-    //Prototipo 1: Lectura de una pagina única de excel
-    const sample = ["identificador", "bandera click", "descripcion", "posicion"];
-    var file = document.getElementById('fileUpload');
-    var reader = new FileReader();
-    if (file.files.length !== 0) {
-      if (file.files[0].name.split('.').pop() === "xlsx" || file.files[0].name.split('.').pop() === "xls" ){
-        reader.readAsArrayBuffer(file.files[0]);
-        reader.onloadend = (e) => {
-          var data = new Uint8Array(e.target.result);
-          var excelRead = XLSX.read(data, {type: 'array'});
-          var firstSheet = excelRead.Sheets[excelRead.SheetNames[0]];
-          var i = -1;
-          var column = "";
-          for (var key in firstSheet) {
-            i++;
-            column = columnName(i);
-            if (key.substring(0, key.length - 1) !== column){
-              column = columnName(i-1);
-              break;
-            } else {
-              if (sample[i] !== firstSheet[column + "1"]["v"]){
-                alert("La plantilla no coincide");
-                i = -1;
-                break;
-              }
-            }
-          }
-          if (i === -1){
-            alert("El archivo no coincide con la plantilla.");
-            file.value = "";
-          } else {
-            alert("Página no vacía");
-            var dataExport = [];
-            var totalRows = parseInt(firstSheet["!ref"].substring(3).match(/(\d+)/g)[0]);
-            for (var rows = 2; rows < totalRows + 1; rows++){
-              var register = {};
-              for (var columns = 0; columns < i; columns++){
-                var cellName = columnName(columns)+rows.toString();
-                try {
-                  register[sample[columns]] = firstSheet[cellName]["v"];
-                } catch (error) {
-                  register[sample[columns]] = "null";
-                }
-              }
-              dataExport.push(register);
-            }
-          }
-        }
-      } else {
-        alert("extension invalida");
-        file.value = "";
-      }
-    }
-  }
-
-  function downloadFile(){
-    //Función para descargar archivo vacío/ plantilla/ generar archivo
-    const sample = ["Nombre", "Apellido", "Ocupación", "CURP"];
-    var dicSample = {};
-    for (var part in sample){
-      dicSample[sample[part]] = "";
-    }
-    const libro = XLSX.utils.book_new();
-    const hoja = XLSX.utils.json_to_sheet([dicSample]);
-    XLSX.utils.book_append_sheet(libro, hoja, "Hoja 1");
-    XLSX.writeFile(libro, "Excel.xlsx");
-  }
-
   function read(){
     //Prototipo 2: Lectura general de excel
     var file = document.getElementById('fileUpload');
@@ -102,24 +33,26 @@ function App() {
             var i = -1;
             var column = "";
             for (var key in firstSheet) {
-              i++;
-              column = columnName(i);
-              if (key.substring(0, key.length - 1) !== column){
-                column = columnName(i-1);
-                break;
+              if (key.substring(0, 1) != "!"){
+                i++;
+                column = columnName(i);
+                if (key.substring(0, key.length - 1) !== column){
+                  column = columnName(i-1);
+                  break;
+                }
               }
             }
             if (i === -1){
               file.value = "";
             } else {
               var dataSheet = [];
-              var sample = [];
+              var sample_sheet = [];
               for (var columns = 0; columns < i; columns++){
                 var cellName = columnName(columns)+"1";
                 try {
-                  sample.push(firstSheet[cellName]["v"]);
+                  sample_sheet.push(firstSheet[cellName]["v"]);
                 } catch (error) {
-                  sample.push(cellName);
+                  sample_sheet.push(cellName);
                 }
               }
               var totalRows = parseInt(firstSheet["!ref"].substring(3).match(/(\d+)/g)[0]);
@@ -128,9 +61,9 @@ function App() {
                 for (var columns = 0; columns < i; columns++){
                   var cellName = columnName(columns)+rows.toString();
                   try {
-                    register[sample[columns]] = firstSheet[cellName]["v"];
+                    register[sample_sheet[columns]] = firstSheet[cellName]["v"];
                   } catch (error) {
-                    register[sample[columns]] = null;
+                    register[sample_sheet[columns]] = null;
                   }
                 }
                 dataSheet.push(register);
