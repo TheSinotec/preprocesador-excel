@@ -177,27 +177,52 @@ function App() {
         hasSample ? (
           <div>
             <>
-              <table className="tabla-container">
-                <thead>
-                  <tr>
-                    {sample.map((item) => (
-                      <th>
-                        {JSON.stringify(item)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {sample.map((item) => (
-                      <td className='boton-muestra' onClick={() => {alert(JSON.stringify(dataFinal[item]))}}>
-                        { JSON.stringify(dataFinal[item]) !== "[]" ? "Mostrar datos" : "Vacío"}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table> 
-              <p>^^ Plantilla <button onClick={() => (exportData())}>Exportar Datos</button> ^^</p>
+              <div className="section-header">
+                <h2>Plantilla para exportación de datos</h2>
+                <button onClick={() => (exportData())}>Exportar Datos</button>
+              </div>
+              <div className="tabla-scroll-wrapper tabla-data-scroll-vertical">
+                <table className="tabla-container">
+                  <thead>
+                    <tr>
+                      {sample.map((item) => (
+                        <th key={item}>
+                          {JSON.stringify(item)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                        {
+                            Object.values(dataFinal)
+                                .reduce((max, arr) => Math.max(max, arr.length), 0) > 0 ? (
+
+                                    // 3. Iterar hasta la fila máxima que tenga datos
+                                    [...Array(
+                                        Object.values(dataFinal).reduce((max, arr) => Math.max(max, arr.length), 0)
+                                    ).keys()].map(rowIndex => (
+                                        <tr key={rowIndex}>
+                                            {sample.map((columnName) => (
+                                                <td key={columnName}> {/* Mostrar el dato real o vacío */}
+                                                    {JSON.stringify(dataFinal[columnName][rowIndex] || null)}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
+                                ) : (
+                                    // 4. Mostrar una fila "Vacío" si no hay datos (solo la fila de headers)
+                                    <tr>
+                                        {sample.map((item) => (
+                                            <td key={item} className='boton-muestra'>
+                                                Vacío
+                                            </td>
+                                        ))}
+                                    </tr>
+                                )
+                        }
+                  </tbody>
+                </table> 
+              </div>
             </>
           </div>
         ) : (
@@ -206,57 +231,65 @@ function App() {
           </div>
         )
       }
-      -----------------------------------------------------
-      <div className="card">
-        <input type="file" id="fileUpload" name="archivo" accept=".xls,.xlsx" required></input>
-         <button onClick={read}>
+      <div className="section-data-import">
+        <h2>Importación de datos</h2>
+        <div className="card">
+          <input type="file" id="fileUpload" name="archivo" accept=".xls,.xlsx" required></input>
+          <button onClick={read}>
           SUBIR
-        </button>
+          </button>
+        </div>
       </div>
       {
         hasRecords ? (
           <div>
             {Object.keys(data).map((key, keyindex) => ( 
-              <><p>{key} <button onClick={()=>(addColumns(key, keyindex))}>Agregar columnas</button> </p>
-                <table className="tabla-container">
-                  {data[key].map((item, index) => (
-                  <><thead>
-                      {index === 0 ? (
-                      <><tr>
-                          {Object.keys(item).map((col, colindex) => (
-                            <th>
-                              <select id={keyindex.toString()+"_"+colindex}>
-                                <option value="slc-1" selected>
-                                  Ninguna
-                                </option>
-                                {sample.map((column, columnindex) => (
-                                  <option value={"slc"+columnindex}>
-                                    {column}
-                                  </option>
-                                ))}
-                              </select>
-                            </th>
-                          ))}
-                        </tr>
-                        <tr>
-                          {Object.keys(item).map((col) => (
-                            <th>
-                              {JSON.stringify(col)}
-                            </th>
-                          ))}
-                        </tr></>):(<></>)}
-                    </thead>
-                    <tbody>
-                        <tr>
-                          {Object.keys(item).map((col) => (
-                            <td>
-                              {JSON.stringify(item[col])}
-                            </td>
-                          ))}
-                        </tr>
-                    </tbody></>
-                  ))}
-                </table> 
+              <>
+                <div className="table-page-header">
+                  <h3>{key}</h3> 
+                  <button onClick={()=>(addColumns(key, keyindex))}>Agregar columnas</button>
+                </div>  
+                  <div className=" tabla-scroll-wrapper tabla-data-scroll-vertical">
+                    <table className="tabla-container">
+                      {data[key].map((item, index) => (
+                      <><thead>
+                          {index === 0 ? (
+                          <><tr>
+                              {Object.keys(item).map((col, colindex) => (
+                                <th>
+                                  <select id={keyindex.toString()+"_"+colindex}>
+                                    <option value="slc-1" selected>
+                                      Ninguna
+                                    </option>
+                                    {sample.map((column, columnindex) => (
+                                      <option value={"slc"+columnindex}>
+                                        {column}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </th>
+                              ))}
+                            </tr>
+                            <tr>
+                              {Object.keys(item).map((col) => (
+                                <th>
+                                  {JSON.stringify(col)}
+                                </th>
+                              ))}
+                            </tr></>):(<></>)}
+                        </thead>
+                        <tbody>
+                            <tr>
+                              {Object.keys(item).map((col) => (
+                                <td>
+                                  {JSON.stringify(item[col])}
+                                </td>
+                              ))}
+                            </tr>
+                        </tbody></>
+                      ))}
+                    </table> 
+                  </div>
               </>
             ))}
           </div>
