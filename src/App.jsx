@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx'
 
 function App() {
   const [data, setData] = useState([]);
-  const [sample, setSample] = useState(["Columna 1", "Columna 2", "Columna 3", "Columna 4", "Columna 5"]);
+  const [sample, setSample] = useState(["Id", "Usuario", "Grupo", "POBLACIÓN", "Nombre completo", "nombre", "apellido paterno", "apellido materno", "correo electrónico", "certificación", "plataforma", "curp", "sexo", "fecha de nacimiento", "edad", "estado", "municipio", "cp", "telefono", "area de procedencia", "carrera", "avance", "certificado", "constancia enviada", "reasignada"]);
   const [dataFinal, setDataFinal] = useState({});
 
   function columnName(num){
@@ -128,7 +128,8 @@ function App() {
         dataExport.push(block);
       }
       alert("Se exportó.")
-      console.log(dataExport);
+      //AQUI SE DEBE CONECTAR AL ENDPOINT
+      console.log(dataExport); // <-- Lista de diccionarios //DEBE REEMPLAZARSE
     }
   }
 
@@ -172,22 +173,10 @@ function App() {
 
   return (
     <>
-      <div className="card">
-        <input type="file" id="fileUpload" name="archivo" accept=".xls,.xlsx" required></input>
-        <button onClick={read}>
-          SUBIR
-        </button>
-      </div>
-      {/*
-      <div className="card">
-        <button onClick={downloadFile}>
-          BAJAR
-        </button>
-      </div>*/}
       {
         hasSample ? (
           <div>
-            <><p>Plantilla <button onClick={() => (exportData())}>Exportar Datos</button> </p>
+            <>
               <table className="tabla-container">
                 <thead>
                   <tr>
@@ -201,13 +190,14 @@ function App() {
                 <tbody>
                   <tr>
                     {sample.map((item) => (
-                      <td>
-                        {JSON.stringify(dataFinal[item])}
+                      <td className='boton-muestra' onClick={() => {alert(JSON.stringify(dataFinal[item]))}}>
+                        { JSON.stringify(dataFinal[item]) !== "[]" ? "Mostrar datos" : "Vacío"}
                       </td>
                     ))}
                   </tr>
                 </tbody>
               </table> 
+              <p>^^ Plantilla <button onClick={() => (exportData())}>Exportar Datos</button> ^^</p>
             </>
           </div>
         ) : (
@@ -216,6 +206,13 @@ function App() {
           </div>
         )
       }
+      -----------------------------------------------------
+      <div className="card">
+        <input type="file" id="fileUpload" name="archivo" accept=".xls,.xlsx" required></input>
+         <button onClick={read}>
+          SUBIR
+        </button>
+      </div>
       {
         hasRecords ? (
           <div>
