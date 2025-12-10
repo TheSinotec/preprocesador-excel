@@ -8,7 +8,12 @@ function App() {
   const [dataFinal, setDataFinal] = useState({});
 
   function columnName(num){
-    // Función obtener nombre de columna en formato excel
+    /**
+     * Convierte un numero en un caracter base 27 nativo de Excel (Hasta 701 == ZZ)
+     * @param {Integer} num - Numero a convertir en base 27
+     * @returns {string} El codigo base 27
+     * @throws {undefined} Si el Excel posee mas de 701 columnas
+    */
     const abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     if (Math.floor(num / 26) !== 0){
               return (abc[Math.floor(num / 26) - 1] + abc[num % 26]);
@@ -18,7 +23,12 @@ function App() {
   }
 
   function read(){
-    //Prototipo 2: Lectura general de excel
+    /**
+     * Lee un archivo *.xlsx | *.xls y lo convierte en un diccionario de listas de diccionarios para manejar los datos 
+     * de cada hoja, columna y registro {data := {nombre_hoja: <lista[diccionario_registros]>}}
+     * Actualiza el estado de << data >>
+     * @returns {null} No retorna
+    */
     var file = document.getElementById('fileUpload');
     var reader = new FileReader();
     if (file.files.length !== 0) {
@@ -84,6 +94,12 @@ function App() {
   }
 
   function chargeData(){
+    /**
+     * Funcion para garantizar generar el modelo de datos de columnas independientes, genera un diccionario si no se han guardado datos
+     * en otro caso, solo refresca la visualizacion de la plantilla.
+     * Actualiza el estado de << dataFinal >> o << sample >>
+     * @returns {null} No retorna
+    */
     if (Object.keys(dataFinal).length === 0){
       var dataPrev = {};
       sample.map((sampleKey) => {
@@ -100,6 +116,10 @@ function App() {
   }
 
   function exportData(){
+    /**
+     * Funcion para generar y exportar los datos acumulados en << dataFinal >>, genera una lista de diccionarios segun la plantilla << sample >>
+     * @returns {null} No retorna
+    */
     var empty = true;
     var max = 0;
     Object.keys(dataFinal).map((key) => {
@@ -134,6 +154,13 @@ function App() {
   }
 
   function takeValues(sheetName, columnName){
+    /**
+     * Funcion auxiliar genera una lista con todos los registros de una hoja y columna dadas en << data >>
+     * @param {string} sheetName - Nombre de la pagina
+     * @param {string} columnName - Nombre de la columna
+     * @returns {list<Any>} Una lista con todos los registros de la hoja << sheetName >> cuya columna sea << columnName >>
+     * @throws {Error} No existen los campos en << data >>
+    */
     var listData = [];
     data[sheetName].map((item) => {
       listData.push(item[columnName]);
@@ -142,6 +169,13 @@ function App() {
   }
 
   function addColumns(sheetName, sheetIndex){
+    /**
+     * Funcion que agrega todas las columnas seleccionadas de una pagina de Excel adjunta a los datos a exportar (<< dataFinal >>)
+     * @param {string} sheetName - Nombre de la pagina
+     * @param {string} columnName - Numero de la pagina (sirve como clave unica en los selectores dinamicos)
+     * @returns {null} No retorna
+     * @throws {Error} No hay restriccion de elementos repetidos, el ultimo es el que sobreescribe el valor de la columna
+    */
     var dataPrev = dataFinal;
     var columns = Object.keys(data[sheetName][0]);
     columns.map((item, index) =>{
@@ -157,6 +191,10 @@ function App() {
   }
 
   function clearSelects() {
+    /**
+     * Funcion auxiliar que 'des-selecciona' los selectores
+     * @returns {null} No retorna
+    */
     var selectElements = document.querySelectorAll('select');
     for (var select of selectElements) {
       select.value = "slc-1";
