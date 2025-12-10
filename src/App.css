@@ -47,3 +47,17 @@
   border-radius: 8px; /* Opcional: esquinas redondeadas */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opcional: sombra */
 }
+
+th, td{
+  border: solid;
+  border-color: black;
+  font-size: 65%;
+}
+
+th{
+  background-color: #504d4d;
+}
+
+.boton-muestra{
+  background-color: #222121;
+}
