@@ -201,6 +201,22 @@ function App() {
     }
   }
 
+  function exportDoc(){
+    /**
+     * Funcion que envía el documento completo añadido a registro
+     * @returns {null} No retorna
+    */
+    var formData = new FormData(document.forms.namedItem("fileinfo"));
+    //SE ENVÍA EL DOCUMENTO AL ENDPOINT 
+    //DEBE SUSTITUIRSE LA CONEXIÓN POR LA PROPIA DE REACT
+    var request = new XMLHttpRequest();
+    request.open("POST", "http://127.0.0.1:8000/api/carga-alumnos/");
+    request.send(formData);
+    request.onload = function (oEvent) {
+      alert("Status del envío: " + request.statusText);
+    };
+  }
+
   const hasRecords = (data.length !== 0);
   const hasSample = (sample.length !== 0);
 
@@ -272,15 +288,18 @@ function App() {
       <div className="section-data-import">
         <h2>Importación de datos</h2>
         <div className="card">
-          <input type="file" id="fileUpload" name="archivo" accept=".xls,.xlsx" required></input>
-          <button onClick={read}>
-          SUBIR
+          <form encType="multipart/form-data" method="post" name="fileinfo">
+            <input type="file" id="fileUpload" name="file" accept=".xls,.xlsx" required></input>
+         </form>
+         <button onClick={read}>
+            SUBIR
           </button>
         </div>
       </div>
       {
         hasRecords ? (
           <div>
+            <button onClick={()=>(exportDoc())}>Exportar doucmento entero</button>
             {Object.keys(data).map((key, keyindex) => ( 
               <>
                 <div className="table-page-header">
